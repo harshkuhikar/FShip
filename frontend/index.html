@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>FShip</title>
+    <style>
+        body {
+            font-family: Arial;
+            text-align: center;
+        }
+
+        #logo {
+            width: 200px;
+            margin: 20px;
+        }
+
+        input {
+            padding: 10px;
+            width: 300px;
+            margin: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <img id="logo" src="your-logo.png" alt="FShip Logo">
+    <h1>FShip Waybill Generator</h1>
+    <input type="text" id="waybillInput" placeholder="Enter Waybill Number">
+    <button onclick="generatePDF()">Generate PDF</button>
+    <button onclick="downloadPDF()">Download PDF</button>
+    <iframe id="pdfPreview" width="100%" height="600px" style="margin-top: 20px;"></iframe>
+
+    <script>
+        let pdfData = null;
+
+        async function generatePDF() {
+            const waybill = document.getElementById('waybillInput').value;
+            try {
+                // Update the URL to your Netlify function URL
+                const response = await fetch('https://your-netlify-site.netlify.app/.netlify/functions/generate-pdf', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ waybill })
+                });
+                pdfData = await response.blob();
+                const pdfUrl = URL.createObjectURL(pdfData);
+                document.getElementById('pdfPreview').src = pdfUrl;
+            } catch (error) {
+                alert('Error generating PDF!');
+            }
+        }
+
+        function downloadPDF() {
+            if (pdfData) {
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(pdfData);
+                link.download = 'shipping_label.pdf';
+                link.click();
+            }
+        }
+    </script>
+</body>
+
+</html>
